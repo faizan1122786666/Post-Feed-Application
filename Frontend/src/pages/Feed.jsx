@@ -1,9 +1,10 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-
+import { useNavigate } from 'react-router-dom'
 const Feed = () => {
 
+    const navigate = useNavigate()
     const [posts, setposts] = useState([
         {
             _id: "1",
@@ -22,11 +23,22 @@ const Feed = () => {
 
     },[])
 
+    const handleButton = async () => {
+        navigate('/create-post')
+    }
+
 
     return (
         <section className='flex flex-col items-center min-h-screen w-full bg-[#f0f2f5] px-4 py-10'>
 
-
+            <div className='w-full max-w-2xl flex items-center justify-between mb-6'>
+                <h1 className='text-[#4a90a4] font-bold text-2xl'>Fee<span className='font-bold text-black'>d.</span></h1>
+                <button onClick={handleButton}
+                className='bg-[#4a90a4] hover:bg-[#3d7a8c] text-white font-bold text-sm px-6 py-3 rounded-lg cursor-pointer transition-colors duration-200'
+                >
+                Add Post 
+                </button>
+            </div>
 
             {posts.length > 0 ? (
                 posts.map((post) => (

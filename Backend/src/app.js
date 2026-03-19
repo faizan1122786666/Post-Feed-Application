@@ -8,37 +8,29 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-
 const upload = multer({
-    storage : multer.memoryStorage()
+    storage: multer.memoryStorage()
 })
 
-app.post("/create-post",upload.single("image"), async (req,res)=>{
+app.post("/create-post", upload.single("image"), async (req, res) => {
     try {
-        console.log(req.body);
-        console.log(req.file);
-
         if (!req.file) {
-            return res.status(400).json({ message: "Image file is required" });
+            return res.status(400).json({ message: "Image file is required" })
         }
 
         const result = await uploadFile(req.file.buffer)
-        
+
         const post = await postModel.create({
-            image : result.url,
-            caption : req.body.caption
+            image: result.url,
+            caption: req.body.caption
         })
 
         return res.status(201).json({
-            message : "Post Created Successfully",
+            message: "Post Created Successfully",
             post
         })
     } catch (err) {
-        if (err.message === 'Request aborted') {
-            console.log('Upload was cancelled by the client');
-            return;
-        }
-        console.error("Error creating post:", err);
+        console.error("Error creating post:", err)
         return res.status(500).json({
             message: "Something went wrong",
             error: err.message
@@ -46,28 +38,12 @@ app.post("/create-post",upload.single("image"), async (req,res)=>{
     }
 })
 
-app.get("/posts",async (req,res)=>{
-
+app.get("/posts", async (req, res) => {
     const posts = await postModel.find()
-
     return res.status(200).json({
-        message : "Post fetched Successfully",
+        message: "Post fetched Successfully",
         posts
     })
-
 })
-
-// Global error handler — catches Multer errors (like "Request aborted")
-app.use((err, req, res, next) => {
-    if (err.message === 'Request aborted') {
-        console.log('Upload was cancelled by the client');
-        return;
-    }
-    console.error("Unhandled error:", err);
-    return res.status(500).json({
-        message: "Something went wrong",
-        error: err.message
-    });
-});
 
 module.exports = app

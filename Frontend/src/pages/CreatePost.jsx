@@ -1,32 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 
 const CreatePost = () => {
 
-  const naviagte = useNavigate()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
-
-    e.preventDefault;
+    e.preventDefault()
 
     const formData = new FormData(e.target)
 
-    axios.post("http://localhost:3000/create-post",formData)
-    .then((res)=>{
+    setLoading(true)
 
-      naviagte("/feed")
-      // alert("Post Created Successfully")
-      // e.target.reset()
-    })
-    .catch((err)=>{
+    try {
+      await axios.post("http://localhost:3000/create-post", formData)
+      e.target.reset()
+
+      navigate("/feed")
+
+    } catch (err) {
       console.log(err)
-     alert("Error Creating Post")
-    })
-
+      alert("Error Creating Post")
+    } finally {
+      setLoading(false)
+    }
   }
-
-
 
   return (
     <section className="flex items-center justify-center min-h-screen w-full bg-[#f0f2f5] px-4 py-10">
@@ -59,9 +59,10 @@ const CreatePost = () => {
 
           <button
             type="submit"
-            className="w-full bg-[#4a90a4] hover:bg-[#3d7a8c] text-white font-semibold text-base py-3 rounded border-none cursor-pointer transition-colors duration-200"
+            disabled={loading}
+            className="w-full bg-[#4a90a4] hover:bg-[#3d7a8c] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-base py-3 rounded border-none cursor-pointer transition-colors duration-200"
           >
-            Publish
+            {loading ? "Publishing..." : "Publish"}
           </button>
 
         </form>

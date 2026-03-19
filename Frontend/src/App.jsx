@@ -1,11 +1,13 @@
-import React from 'react'
-import { BrowserRouter,Routes,Route } from 'react-router-dom'
+import { BrowserRouter,Routes,Route, Navigate } from 'react-router-dom'
 import CreatePost from './pages/CreatePost'
 import Feed from './pages/Feed'
+
 const App = () => {
+
   return (
     <BrowserRouter>
     <Routes>
+      <Route path='/' element={<Navigate to='/create-post' />} />
       <Route path='/create-post' element={<CreatePost/>} />
       <Route path='/feed' element={<Feed/>} />
     </Routes>

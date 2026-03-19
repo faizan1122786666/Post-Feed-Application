@@ -10,7 +10,8 @@ const imageKit = new Imagekit({
 async function uploadFile(file) {
 
     const result = await imageKit.files.upload({
-        file: Buffer.toString("base64"),
+        // file: Buffer.toString("base64"),
+        file: file.toString("base64"), 
         fileName: "image.jpg"
     })
 
