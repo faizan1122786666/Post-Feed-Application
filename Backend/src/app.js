@@ -1,0 +1,73 @@
+const express = require("express")
+const multer = require("multer")
+const uploadFile = require("./services/storage.service.js")
+const postModel = require("./models/post.model.js")
+const cors = require('cors')
+
+const app = express()
+app.use(cors())
+app.use(express.json())
+
+
+const upload = multer({
+    storage : multer.memoryStorage()
+})
+
+app.post("/create-post",upload.single("image"), async (req,res)=>{
+    try {
+        console.log(req.body);
+        console.log(req.file);
+
+        if (!req.file) {
+            return res.status(400).json({ message: "Image file is required" });
+        }
+
+        const result = await uploadFile(req.file.buffer)
+        
+        const post = await postModel.create({
+            image : result.url,
+            caption : req.body.caption
+        })
+
+        return res.status(201).json({
+            message : "Post Created Successfully",
+            post
+        })
+    } catch (err) {
+        if (err.message === 'Request aborted') {
+            console.log('Upload was cancelled by the client');
+            return;
+        }
+        console.error("Error creating post:", err);
+        return res.status(500).json({
+            message: "Something went wrong",
+            error: err.message
+        })
+    }
+})
+
+app.get("/posts",async (req,res)=>{
+
+    const posts = await postModel.find()
+
+    return res.status(200).json({
+        message : "Post fetched Successfully",
+        posts
+    })
+
+})
+
+// Global error handler — catches Multer errors (like "Request aborted")
+app.use((err, req, res, next) => {
+    if (err.message === 'Request aborted') {
+        console.log('Upload was cancelled by the client');
+        return;
+    }
+    console.error("Unhandled error:", err);
+    return res.status(500).json({
+        message: "Something went wrong",
+        error: err.message
+    });
+});
+
+module.exports = app
