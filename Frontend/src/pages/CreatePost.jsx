@@ -15,7 +15,8 @@ const CreatePost = () => {
     setLoading(true)
 
     try {
-      await axios.post("http://localhost:3000/create-post", formData)
+      // await axios.post("http://localhost:3000/create-post", formData)
+      await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData)
       e.target.reset()
 
       navigate("/feed")
