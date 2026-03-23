@@ -6,9 +6,13 @@ const cors = require('cors')
 
 const app = express()
 // app.use(cors())
+// app.use(cors({
+//   origin: "*"
+// }))
 app.use(cors({
-  origin: "*"
-}))
+  origin: ["https://postbyme.me", "https://www.postbyme.me"],
+  credentials: true
+}));
 app.use(express.json())
 
 const upload = multer({
