@@ -8,13 +8,7 @@ const LATEST_PICTURE_WINDOW_IN_HOURS = 6
 
 const Feed = () => {
   const navigate = useNavigate()
-  const [posts, setposts] = useState([
-    {
-      _id: "1",
-      image: "https://picsum.photos/600/400",
-      caption: "Beautiful Scene"
-    }
-  ])
+  const [posts, setposts] = useState([])
   const [deletingPostId, setDeletingPostId] = useState(null)
 
   const isLatestPicture = (createdAt) => {
@@ -44,6 +38,12 @@ const Feed = () => {
       setDeletingPostId(postId)
       await axios.delete(`${import.meta.env.VITE_API_URL}/posts/${postId}`)
       setposts((currentPosts) => currentPosts.filter((post) => post._id !== postId))
+
+      if (sessionStorage.getItem('latestPostId') === postId) {
+        sessionStorage.removeItem('latestPostId')
+        sessionStorage.removeItem('latestPostCreatedAt')
+      }
+
       toast.success('Post deleted successfully')
     } catch (err) {
       console.log(err)
@@ -53,7 +53,13 @@ const Feed = () => {
     }
   }
 
-  const hasLatestPost = posts.some((post) => isLatestPicture(post.createdAt))
+  const latestPostId = sessionStorage.getItem('latestPostId')
+  const latestPostCreatedAt = sessionStorage.getItem('latestPostCreatedAt')
+
+  const hasLatestPost = posts.length > 0 && (
+    (latestPostId && posts[0]?._id === latestPostId) ||
+    isLatestPicture(latestPostCreatedAt || posts[0]?.createdAt)
+  )
 
   return (
     <section className='flex flex-col items-center min-h-screen w-full bg-[#f0f2f5] px-4 py-10'>

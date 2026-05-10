@@ -62,7 +62,13 @@ const CreatePost = () => {
     setLoading(true)
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData)
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData)
+      const createdPost = response.data?.post
+
+      if (createdPost?._id) {
+        sessionStorage.setItem('latestPostId', createdPost._id)
+        sessionStorage.setItem('latestPostCreatedAt', createdPost.createdAt || new Date().toISOString())
+      }
 
       e.target.reset()
       handleRemoveImage()
@@ -70,7 +76,8 @@ const CreatePost = () => {
       navigate("/feed")
     } catch (err) {
       console.log(err)
-      toast.error("Error creating post")
+      const errorMessage = err.response?.data?.message || "Error creating post"
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
