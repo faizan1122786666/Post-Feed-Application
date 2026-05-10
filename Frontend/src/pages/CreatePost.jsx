@@ -63,12 +63,6 @@ const CreatePost = () => {
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData)
-      const createdPost = response.data?.post
-
-      if (createdPost?._id) {
-        sessionStorage.setItem('latestPostId', createdPost._id)
-        sessionStorage.setItem('latestPostCreatedAt', createdPost.createdAt || new Date().toISOString())
-      }
 
       e.target.reset()
       handleRemoveImage()

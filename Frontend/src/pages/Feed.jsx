@@ -38,12 +38,6 @@ const Feed = () => {
       setDeletingPostId(postId)
       await axios.delete(`${import.meta.env.VITE_API_URL}/posts/${postId}`)
       setposts((currentPosts) => currentPosts.filter((post) => post._id !== postId))
-
-      if (sessionStorage.getItem('latestPostId') === postId) {
-        sessionStorage.removeItem('latestPostId')
-        sessionStorage.removeItem('latestPostCreatedAt')
-      }
-
       toast.success('Post deleted successfully')
     } catch (err) {
       console.log(err)
@@ -52,14 +46,6 @@ const Feed = () => {
       setDeletingPostId(null)
     }
   }
-
-  const latestPostId = sessionStorage.getItem('latestPostId')
-  const latestPostCreatedAt = sessionStorage.getItem('latestPostCreatedAt')
-
-  const hasLatestPost = posts.length > 0 && (
-    (latestPostId && posts[0]?._id === latestPostId) ||
-    isLatestPicture(latestPostCreatedAt || posts[0]?.createdAt)
-  )
 
   return (
     <section className='flex flex-col items-center min-h-screen w-full bg-[#f0f2f5] px-4 py-10'>
@@ -73,12 +59,6 @@ const Feed = () => {
             Create Post
           </button>
         </div>
-
-        {hasLatestPost && (
-          <p className='mt-3 border-l-4 border-red-500 pl-3 text-sm font-semibold text-red-600'>
-            Latest
-          </p>
-        )}
       </div>
 
       {posts.length > 0 ? (
