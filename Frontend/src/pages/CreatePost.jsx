@@ -1,18 +1,57 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { FiArrowLeft } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const CreatePost = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState("")
+  const fileInputRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl)
+      }
+    }
+  }, [previewUrl])
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files?.[0]
+
+    if (!selectedFile) {
+      return
+    }
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
+    setFile(selectedFile)
+    setPreviewUrl(URL.createObjectURL(selectedFile))
+  }
+
+  const handleRemoveImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl)
+    }
+
+    setFile(null)
+    setPreviewUrl("")
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!file) {
-      alert("Please select an image")
+      toast.error("Please select an image")
       return
     }
 
@@ -23,18 +62,15 @@ const CreatePost = () => {
     setLoading(true)
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      })
+      await axios.post(`${import.meta.env.VITE_API_URL}/create-post`, formData)
 
       e.target.reset()
-      setFile(null)
+      handleRemoveImage()
+      toast.success("Post Upload Successfully")
       navigate("/feed")
     } catch (err) {
       console.log(err)
-      alert("Error Creating Post")
+      toast.error("Error creating post")
     } finally {
       setLoading(false)
     }
@@ -63,13 +99,30 @@ const CreatePost = () => {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-gray-800">Cover Image</label>
             <input
+              ref={fileInputRef}
               type="file"
               name="image"
               accept="image/*"
-              onChange={(e) => setFile(e.target.files[0])}
-              required
+              onChange={handleFileChange}
               className="w-full rounded-xl border border-gray-300 bg-[#eef1f6] px-3 py-2.5 text-sm text-gray-700 cursor-pointer file:mr-3 file:rounded-lg file:border file:border-gray-300 file:bg-white file:px-3 file:py-1 file:text-sm file:text-gray-700 file:cursor-pointer"
             />
+
+            {previewUrl && (
+              <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-[#f8fafc] p-3">
+                <img
+                  src={previewUrl}
+                  alt="Selected preview"
+                  className="h-72 w-full rounded-xl object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveImage}
+                  className="absolute right-6 top-6 rounded-full bg-black/70 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-black"
+                >
+                  Remove Picture
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">

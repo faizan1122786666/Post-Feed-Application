@@ -10,7 +10,12 @@ const app = express()
 //   origin: "*"
 // }))
 app.use(cors({
-  origin: ["https://postbyme.me", "https://www.postbyme.me"],
+  origin: [
+    "https://postbyme.me",
+    "https://www.postbyme.me",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+  ],
   credentials: true
 }));
 app.use(express.json())
@@ -46,11 +51,33 @@ app.post("/create-post", upload.single("image"), async (req, res) => {
 })
 
 app.get("/posts", async (req, res) => {
-    const posts = await postModel.find()
+    const posts = await postModel.find().sort({ createdAt: -1 })
     return res.status(200).json({
         message: "Post fetched Successfully",
         posts
     })
+})
+
+app.delete("/posts/:id", async (req, res) => {
+    try {
+        const deletedPost = await postModel.findByIdAndDelete(req.params.id)
+
+        if (!deletedPost) {
+            return res.status(404).json({
+                message: "Post not found"
+            })
+        }
+
+        return res.status(200).json({
+            message: "Post deleted successfully"
+        })
+    } catch (err) {
+        console.error("Error deleting post:", err)
+        return res.status(500).json({
+            message: "Something went wrong",
+            error: err.message
+        })
+    }
 })
 
 module.exports = app
