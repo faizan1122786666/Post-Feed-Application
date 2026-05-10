@@ -4,22 +4,22 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
-const LATEST_PICTURE_WINDOW_IN_HOURS = 6
+const NEW_POST_WINDOW_IN_HOURS = 3
 
 const Feed = () => {
   const navigate = useNavigate()
   const [posts, setposts] = useState([])
   const [deletingPostId, setDeletingPostId] = useState(null)
 
-  const isLatestPicture = (createdAt) => {
+  const isNewPost = (createdAt) => {
     if (!createdAt) {
       return false
     }
 
     const createdTime = new Date(createdAt).getTime()
-    const latestWindow = LATEST_PICTURE_WINDOW_IN_HOURS * 60 * 60 * 1000
+    const newPostWindow = NEW_POST_WINDOW_IN_HOURS * 60 * 60 * 1000
 
-    return Date.now() - createdTime <= latestWindow
+    return Date.now() - createdTime <= newPostWindow
   }
 
   useEffect(() => {
@@ -47,9 +47,17 @@ const Feed = () => {
     }
   }
 
+  const showNewPostBanner = posts.length > 0 && isNewPost(posts[0]?.createdAt)
+
   return (
     <section className='flex flex-col items-center min-h-screen w-full bg-[#f0f2f5] px-4 py-10'>
       <div className='w-full max-w-2xl mb-6'>
+        {showNewPostBanner && (
+          <div className='mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600'>
+            New Post
+          </div>
+        )}
+
         <div className='flex items-center justify-between'>
           <h1 className='text-[#4a90a4] font-bold text-2xl'>Fee<span className='font-bold text-black'>d.</span></h1>
           <button
