@@ -3,8 +3,24 @@ import axios from 'axios'
 import { FiArrowLeft } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { siteSeo, usePageSeo } from '../utils/seo'
 
 const CreatePost = () => {
+  usePageSeo({
+    title: 'Create a Post | PostByMe',
+    description: 'Create and publish a social media post inside PostByMe.',
+    pathname: '/create-post',
+    keywords: siteSeo.defaultKeywords,
+    robots: 'noindex, follow',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Create Post',
+      url: `${siteSeo.siteUrl}/create-post/`,
+      description: 'Internal PostByMe page for creating a new post.'
+    }
+  })
+
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [file, setFile] = useState(null)

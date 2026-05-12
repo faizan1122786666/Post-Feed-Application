@@ -3,10 +3,26 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { siteSeo, usePageSeo } from '../utils/seo'
 
 const NEW_POST_WINDOW_IN_HOURS = 3
 
 const Feed = () => {
+  usePageSeo({
+    title: 'PostByMe App Feed',
+    description: 'Manage published posts inside the PostByMe application feed.',
+    pathname: '/feed',
+    keywords: siteSeo.defaultKeywords,
+    robots: 'noindex, follow',
+    structuredData: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'PostByMe Feed',
+      url: `${siteSeo.siteUrl}/feed/`,
+      description: 'Internal application feed for PostByMe.'
+    }
+  })
+
   const navigate = useNavigate()
   const [posts, setposts] = useState([])
   const [deletingPostId, setDeletingPostId] = useState(null)
